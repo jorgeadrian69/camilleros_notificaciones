@@ -48,12 +48,12 @@ export default {
             to: '/profile',
             label: 'Mi Perfil',
             icon: 'account-circle'
-          },
-          {
-            to: '/profile',
-            label: 'Almuerzo',
-            icon: 'calendar-clock'
           }
+          // {
+          //   to: '/profile',
+          //   label: 'Almuerzo',
+          //   icon: 'calendar-clock'
+          // }
           // {
           //   label: 'Submenus',
           //   subLabel: 'Submenus Example',

@@ -7,7 +7,8 @@ Vue.use(Vuex)
 const userLogin = {
   userName: null,
   userEmail: null,
-  userAvatar: null
+  userAvatar: null,
+  userWindow: null
 }
 
 export default new Vuex.Store({
@@ -45,6 +46,9 @@ export default new Vuex.Store({
       }
       if (payload.avatar) {
         state.userAvatar = payload.avatar
+      }
+      if (payload.window) {
+        state.userWindow = payload.window
       }
     },
 

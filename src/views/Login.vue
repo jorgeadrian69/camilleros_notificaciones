@@ -12,7 +12,6 @@
               <b-field label="Usuario de Windows">
                 <b-input v-model="form.username" placeholder="Tu usuario" required></b-input>
               </b-field>
-
               <b-field label="Contraseña">
                 <b-input
                   type="password"
@@ -21,6 +20,16 @@
                   placeholder="Tu Contraseña"
                   required
                 ></b-input>
+              </b-field>
+              <b-field label="N° de Celular">
+                 <b-select placeholder="Seleccioná un teléfono" required expanded>
+                  <option
+                      v-for="option in allTelefonos"
+                      :value="option.id"
+                      :key="option.id">
+                      {{ option.id }}
+                  </option>
+                </b-select>
               </b-field>
             </section>
             <footer class="modal-card-foot">
@@ -49,12 +58,16 @@ export default {
   },
   data () {
     return {
-      isLoading: false,
+      isLoading: true,
+      allTelefonos: [],
       form: {
         username: null,
         password: null
       }
     }
+  },
+  created () {
+    this.telefonos()
   },
   computed: {
     titleStack () {
@@ -62,16 +75,20 @@ export default {
     }
   },
   methods: {
-    submit () {
-      const user = { username: this.form.username, password: this.form.password }
+    async submit () {
+      const loadingComponent = this.$buefy.loading.open()
+      const user = { username: this.form.username.toLowerCase(), password: this.form.password }
+      const username = this.form.username
+      const validarCamillero = await this.validarCamilleroExiste(username)
       this.$store.state.services.tecnomet
         .login(user, 'post')
         .then((r) => {
-          if (r.data.length !== 0) {
+          if (r.data.length !== 0 && validarCamillero === true) {
             this.$store.commit('user', {
               name: r.data.original.nombre,
               email: r.data.original.email,
-              avatar: 'https://avatars.dicebear.com/v2/gridy/John-Doe.svg'
+              avatar: 'https://avatars.dicebear.com/v2/gridy/John-Doe.svg',
+              window: username
             })
 
             this.$buefy.snackbar.open({
@@ -81,12 +98,15 @@ export default {
             })
 
             this.$router.push('/tables')
+            loadingComponent.close()
+            return true
           } else {
             this.$buefy.snackbar.open({
-              message: 'Usuario o contraseña inválido.',
+              message: 'Usuario u contraseña inválido.',
               queue: false,
               type: 'is-danger'
             })
+            loadingComponent.close()
           }
         })
         .catch((r) => {})
@@ -103,6 +123,26 @@ export default {
         message: 'Reset successfully',
         queue: false
       })
+    },
+    async validarCamilleroExiste (username) {
+      const respuesta = await this.$store.state.services.tecnomet
+        .camillerosTienePermisos(username)
+        .then((data) => data.data)
+      if (!respuesta) {
+        this.$buefy.snackbar.open({
+          message: 'Usuario sin permiso.',
+          queue: false,
+          type: 'is-danger'
+        })
+      }
+      return respuesta
+    },
+    telefonos () {
+      this.$store.state.services.tecnomet
+        .telefonos()
+        .then((data) => {
+          this.allTelefonos = data.data.data
+        })
     }
   }
 }

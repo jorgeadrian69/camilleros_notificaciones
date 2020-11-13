@@ -4,11 +4,12 @@ export default class Tecnomet {
 
   constructor (axios) {
     this.axios = axios
-    this.baseUrl = 'http://localhost:8002/api/'
+    this.baseUrl = 'http://10.0.0.10/ldap/public/api/'
+    this.urlApi = 'http://10.0.0.10/camilleros_app/public/api/v1/'
   }
 
-  getCamilleroSolicitudes () {
-    return this.axios.get('http://127.0.0.1:8000/api/v1/solicitud/camilleros')
+  getCamilleroSolicitudes (camillero) {
+    return this.axios.get(`${this.urlApi}solicitud/camilleros/${camillero}`)
   }
 
   login (usuario, method) {
@@ -18,5 +19,43 @@ export default class Tecnomet {
       url,
       data: usuario
     })
+  }
+
+  camillerosTienePermisos (username) {
+    const url = `${this.urlApi}solicitud/checkcamillero`
+    const method = 'post'
+    return this.axios({
+      method,
+      url,
+      data: { username: username }
+    })
+  }
+
+  cambiarEstadoSolicitud (usuario) {
+    const url = `${this.urlApi}solicitud/cambiar`
+    const method = 'post'
+    return this.axios({
+      method,
+      url,
+      data: usuario
+    })
+  }
+
+  rechazarSolicitud (solicitud) {
+    const url = `${this.urlApi}solicitud/rechazo`
+    const method = 'post'
+    return this.axios({
+      method,
+      url,
+      data: solicitud
+    })
+  }
+
+  motivosRechazos () {
+    return this.axios.get(`${this.urlApi}solicitud/rechazos`)
+  }
+
+  telefonos () {
+    return this.axios.get(`${this.urlApi}solicitud/telefonos`)
   }
 }

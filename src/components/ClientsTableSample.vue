@@ -2,7 +2,7 @@
   <div>
     <modal-box
       :is-active="isModalActive"
-      :trash-object-name="trashObjectName"
+      :trash-object-id="trashObjectId"
       @confirm="trashConfirm"
       @cancel="trashCancel"
     />
@@ -16,7 +16,7 @@
       default-sort="prioridad"
       :data="solicitudes"
     >
-      <template slot-scope="props">
+      <template slot-scope="props" v-if="props.row">
         <b-table-column label="Prioridad" :class="props.row.prioridad == 'Urgente' ? 'has-background-danger' : ''" field="prioridad" sortable>
           {{ props.row.prioridad }}
         </b-table-column>
@@ -33,7 +33,7 @@
           {{ props.row.transporte }}
         </b-table-column>
         <b-table-column label="Fecha" field="fecha" sortable>
-          {{ props.row.fecha }}
+          {{ getDate(props.row.fecha) }}
         </b-table-column>
         <b-table-column label="Hora" field="hora" sortable>
           {{ getHour(props.row.hora) }}
@@ -43,20 +43,44 @@
         </b-table-column>
         <b-table-column label="Acciones" custom-key="actions" class="is-actions-cell">
           <div class="buttons is-center">
-            <b-tooltip label="Aceptar Solicitud"
+            <b-tooltip label="Aceptar Solicitud" v-if="props.row.estado == 2"
               class="pr-1"
               type="is-dark"
               position="is-top">
-              <button class="button is-small is-success">
-                  <b-icon icon="checkbox-marked-circle-outline" size="is-small" />
+              <button class="button is-small is-success" @click="changeStateSolicitud(props.row.id,3)">
+                  <b-icon icon="checkbox-marked-circle" size="is-small" />
+              </button>
+            </b-tooltip>
+            <b-tooltip label="Empezar Solicitud" v-if="props.row.estado == 3"
+              class="pr-1"
+              type="is-dark"
+              position="is-top">
+              <button class="button is-small is-info" @click="changeStateSolicitud(props.row.id,4)">
+                  <b-icon icon="play" size="is-small" />
+              </button>
+            </b-tooltip>
+            <b-tooltip label="Cerrar Solicitud" v-if="props.row.estado == 4"
+              class="pr-1"
+              type="is-dark"
+              position="is-top">
+              <button class="button is-small is-warning" @click="changeStateSolicitud(props.row.id,5)">
+                  <b-icon icon="check-all" size="is-small" />
               </button>
             </b-tooltip>
             <b-tooltip label="Datos del Paciente"
               class="pr-1"
               type="is-dark"
-              position="is-top">
+              position="is-left">
               <button class="button is-small is-info" @click="showDetails(props.row)">
                   <b-icon icon="clipboard-account" size="is-small" />
+              </button>
+            </b-tooltip>
+            <b-tooltip label="Rechazar Solicitud" v-if="props.row.estado == 4"
+              class="pr-1"
+              type="is-dark"
+              position="is-left">
+              <button class="button is-small is-danger" @click.prevent="trashModal(props.row)">
+                  <b-icon icon="close-circle-outline" size="is-small" />
               </button>
             </b-tooltip>
           </div>
@@ -84,6 +108,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import axios from 'axios'
 import ModalBox from '@/components/ModalBox'
 import Details from '@/components/DetailsSolicitud'
@@ -111,13 +136,15 @@ export default {
       isLoading: false,
       paginated: false,
       perPage: 10,
-      checkedRows: []
+      checkedRows: [],
+      timer: null
     }
   },
   computed: {
-    trashObjectName () {
+    ...mapState(['userWindow']),
+    trashObjectId () {
       if (this.trashObject) {
-        return this.trashObject.name
+        return this.trashObject.id
       }
 
       return null
@@ -153,8 +180,9 @@ export default {
     },
     trashConfirm () {
       this.isModalActive = false
+      this.reload()
       this.$buefy.snackbar.open({
-        message: 'Confirmed',
+        message: 'Rechazado',
         queue: false
       })
     },
@@ -173,14 +201,48 @@ export default {
       })
     },
     getDate (date) {
-
+      const data = new Date(date)
+      return data.toLocaleDateString('es-ES')
     },
     getHour (date) {
       const data = new Date(date)
       const hours = data.getHours()
       const minutes = data.getMinutes()
       return `${hours}:${minutes}`
+    },
+    changeStateSolicitud (id, estado) {
+      const usuario = {
+        username: this.userWindow,
+        solicitud_id: id,
+        estado_solicitud: estado
+      }
+
+      this.reload()
+
+      this.$store.state.services.tecnomet
+        .cambiarEstadoSolicitud(usuario)
+        .then((r) => {
+          this.reload()
+          this.$buefy.snackbar.open({
+            message: 'Se cambio el estado con éxito.',
+            position: 'is-top',
+            queue: false,
+            type: 'is-success'
+          })
+        })
+        .catch((r) => {})
+      /**
+       * $camillero_autenticado_id = $request->id_camillero;
+        $solicitud_id = $request->id_solicitud;
+        $estado = $request->estado_solicitud;
+       */
+    },
+    reload () {
+      this.$emit('reload')
     }
+  },
+  created () {
+    this.timer = setInterval(this.reload, 60000)
   }
 }
 </script>

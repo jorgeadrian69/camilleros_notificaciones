@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <title-bar :title-stack="titleStack" />
@@ -13,6 +14,7 @@
         <clients-table-sample
           :solicitudes="solicitudes"
           :checkable="true"
+          @reload="getData()"
         />
       </card-component>
     </section>
@@ -39,7 +41,7 @@ export default {
     ClientsTableSample
   },
   computed: {
-    ...mapState(['userName', 'userEmail']),
+    ...mapState(['userName', 'userWindow']),
     titleStack () {
       return ['Admin', 'Solicitudes']
     }
@@ -52,10 +54,10 @@ export default {
   },
   methods: {
     getData () {
+      const username = this.userWindow
       this.$store.state.services.tecnomet
-        .getCamilleroSolicitudes()
+        .getCamilleroSolicitudes(username)
         .then((r) => {
-          console.log(r.data.data)
           this.solicitudes = r.data.data
         })
         .catch((r) => {})
