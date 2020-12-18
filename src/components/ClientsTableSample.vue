@@ -26,8 +26,20 @@
         <b-table-column label="Origen" field="origen" sortable>
           {{ props.row.origen }}
         </b-table-column>
+        <b-table-column label="Piso Origen" field="origen" sortable>
+          {{ props.row.piso_origen }}
+        </b-table-column>
+        <b-table-column label="Cama Origen" field="origen" sortable>
+          {{ props.row.cama_origen }}
+        </b-table-column>
         <b-table-column label="Destino" field="destino" sortable>
           {{ props.row.destino }}
+        </b-table-column>
+        <b-table-column label="Piso Destino" field="destino" sortable>
+          {{ props.row.piso_destino }}
+        </b-table-column>
+        <b-table-column label="Cama Destino" field="destino" sortable>
+          {{ props.row.cama_destino }}
         </b-table-column>
         <b-table-column label="Transporte" field="transporte" sortable>
           {{ props.row.transporte }}
@@ -39,7 +51,7 @@
           {{ getHour(props.row.hora) }}
         </b-table-column>
         <b-table-column label="Emisor" field="usuario" sortable>
-          {{ props.row.usuario }}
+          {{  props.row.usuario_nombre }}
         </b-table-column>
         <b-table-column label="Acciones" custom-key="actions" class="is-actions-cell">
           <div class="buttons is-center">
@@ -83,6 +95,22 @@
                   <b-icon icon="close-circle-outline" size="is-small" />
               </button>
             </b-tooltip>
+            <b-tooltip label="Refuerzo" v-if="props.row.estado == 4"
+              class="pr-1"
+              type="is-dark"
+              position="is-left">
+              <button class="button is-small is-danger" @click.prevent=" changeStateSolicitud(props.row.id,8)">
+                  <b-icon icon="account-multiple-plus" size="is-small" />
+              </button>
+            </b-tooltip>
+             <b-tooltip label="Informacion"
+              class="pr-1"
+              type="is-dark"
+              position="is-left">
+              <button class="button is-small is-info" @click.prevent="informacion()">
+                  <b-icon icon="information" size="is-small" />
+              </button>
+            </b-tooltip>
           </div>
         </b-table-column>
       </template>
@@ -112,6 +140,7 @@ import { mapState } from 'vuex'
 import axios from 'axios'
 import ModalBox from '@/components/ModalBox'
 import Details from '@/components/DetailsSolicitud'
+import Informacion from '../views/Informacion'
 
 export default {
   name: 'ClientsTableSample',
@@ -189,6 +218,14 @@ export default {
     trashCancel () {
       this.isModalActive = false
     },
+    informacion () {
+      this.$buefy.modal.open({
+        parent: this,
+        component: Informacion,
+        hasModalCard: true,
+        trapFocus: true
+      })
+    },
     showDetails (row) {
       this.$buefy.modal.open({
         parent: this,
@@ -225,7 +262,7 @@ export default {
           this.reload()
           this.$buefy.snackbar.open({
             message: 'Se cambio el estado con éxito.',
-            position: 'is-top',
+            position: 'is-button',
             queue: false,
             type: 'is-success'
           })
@@ -242,7 +279,7 @@ export default {
     }
   },
   created () {
-    this.timer = setInterval(this.reload, 60000)
+    this.timer = setInterval(this.reload, 6000)
   }
 }
 </script>

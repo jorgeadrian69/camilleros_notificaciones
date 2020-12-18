@@ -48,12 +48,17 @@ export default {
             to: '/profile',
             label: 'Mi Perfil',
             icon: 'account-circle'
+          },
+          {
+            to: '/colacion',
+            label: 'Colaciones',
+            icon: 'calendar-clock'
+          },
+          {
+            to: '/pendientes',
+            label: 'Pendientes',
+            icon: 'arrow-down-bold-circle'
           }
-          // {
-          //   to: '/profile',
-          //   label: 'Almuerzo',
-          //   icon: 'calendar-clock'
-          // }
           // {
           //   label: 'Submenus',
           //   subLabel: 'Submenus Example',

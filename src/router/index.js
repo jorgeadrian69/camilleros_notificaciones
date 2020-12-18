@@ -36,6 +36,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Colaciones'
+    },
+    path: '/colacion',
+    name: 'colacion',
+    component: () => import(/* webpackChunkName: "forms" */ '../views/Colacion')
+  },
+  {
+    meta: {
       title: 'Profile'
     },
     path: '/profile',
@@ -58,6 +66,14 @@ const routes = [
     name: 'client.edit',
     component: () => import(/* webpackChunkName: "client-form" */ '../views/ClientForm.vue'),
     props: true
+  },
+  {
+    meta: {
+      title: 'Pendientes'
+    },
+    path: '/pendientes',
+    name: 'pendientes',
+    component: () => import(/* webpackChunkName: "forms" */ '../views/Pendientes')
   }
 ]
 
