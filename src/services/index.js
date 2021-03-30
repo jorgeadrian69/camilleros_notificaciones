@@ -58,4 +58,18 @@ export default class Tecnomet {
   telefonos () {
     return this.axios.get(`${this.urlApi}solicitud/telefonos`)
   }
+
+  pedientesAprobacion (username) {
+    return this.axios.get(`${this.urlApi}solicitud/solicitudes/${username}`)
+  }
+
+  pedirColacion (idCamillero, idColaccion) {
+    const url = `${this.urlApi}solicitud/aceptar/colacion`
+    const method = 'post'
+    return this.axios({
+      method,
+      url,
+      data: { id_camillero: idCamillero, id_colacion: idColaccion }
+    })
+  }
 }

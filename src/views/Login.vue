@@ -83,12 +83,13 @@ export default {
       this.$store.state.services.tecnomet
         .login(user, 'post')
         .then((r) => {
-          if (r.data.length !== 0 && validarCamillero === true) {
+          if (r.data.length !== 0 && validarCamillero) {
             this.$store.commit('user', {
               name: r.data.original.nombre,
               email: r.data.original.email,
               avatar: 'https://avatars.dicebear.com/v2/gridy/John-Doe.svg',
-              window: username
+              window: username,
+              id: validarCamillero
             })
 
             this.$buefy.snackbar.open({

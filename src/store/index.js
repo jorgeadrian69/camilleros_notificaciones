@@ -8,7 +8,8 @@ const userLogin = {
   userName: null,
   userEmail: null,
   userAvatar: null,
-  userWindow: null
+  userWindow: null,
+  userId: null
 }
 
 export default new Vuex.Store({
@@ -38,6 +39,9 @@ export default new Vuex.Store({
 
     /* User */
     user (state, payload) {
+      if (payload.id) {
+        state.userId = payload.id
+      }
       if (payload.name) {
         state.userName = payload.name
       }

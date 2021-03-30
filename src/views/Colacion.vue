@@ -13,7 +13,7 @@
         <card-component title="Colaciones" icon="clock" class="tile is-child">
           <hr />
         <b-field label="Seleccione una colación" label-position="on-border" >
-            <b-select placeholder="Seleccione una por favor">
+            <b-select placeholder="Seleccione una por favor" v-model="colacion">
                 <option
                     v-for="option in colaciones"
                     :value="option.id"
@@ -54,14 +54,15 @@ export default {
   },
   data () {
     return {
-      colaciones: []
+      colaciones: [],
+      colacion: null
     }
   },
   computed: {
     titleStack () {
       return ['Admin', 'Colaciones']
     },
-    ...mapState(['userName', 'userEmail'])
+    ...mapState(['userName', 'userEmail', 'userId'])
   },
   created () {
     if (!this.userName) {
@@ -74,13 +75,18 @@ export default {
       const data = await Axios.get('http://127.0.0.1:8000/api/v1/solicitud/colaciones')
       this.colaciones = data.data
     },
-    aceptarColacion () {
-      this.$buefy.snackbar.open({
-        message: 'Se informó con exito su hora de descanso',
-        queue: false
-      })
+    async aceptarColacion () {
+      const respuesta = await this.$store.state.services.tecnomet.pedirColacion(this.userId, this.colacion)
+      if (respuesta.status === 200) {
+        if (respuesta.data.estado === 'ok') {
+          this.$buefy.snackbar.open({
+            message: 'Se informó con exito su hora de descanso',
+            queue: false
+          })
 
-      this.$router.push('/tables')
+          this.$router.push('/tables')
+        }
+      }
     }
   }
 }
